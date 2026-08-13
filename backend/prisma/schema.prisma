@@ -1,0 +1,209 @@
+// ─── Prisma Schema ─── CineVerse AI ───────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+// ─── User Model ───────────────────────────────────────
+
+model User {
+  id            String       @id @default(uuid()) @db.Uuid
+  email         String       @unique @db.VarChar(255)
+  fullName      String?      @map("full_name") @db.VarChar(100)
+  name          String?      @db.VarChar(100)
+  avatarUrl     String?      @map("avatar_url")
+  passwordHash  String?      @map("password_hash")
+  emailVerified Boolean      @default(false) @map("email_verified")
+  authProvider  AuthProvider @default(EMAIL) @map("auth_provider")
+  provider      AuthProvider @default(EMAIL)
+  providerId    String?      @map("provider_id")
+  role          Role         @default(USER)
+
+  refreshTokens          RefreshToken[]
+  preferences            UserPreference?
+  recommendationHistories RecommendationHistory[]
+  recommendationSessions MovieRecommendationSession[]
+  searchHistories        SearchHistory[]
+  conversations          Conversation[]
+  recommendationRequests RecommendationRequest[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// ─── Refresh Token Model ──────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique @db.VarChar(500)
+  userId    String   @map("user_id") @db.Uuid
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// ─── User Preference Model ────────────────────────────
+
+model UserPreference {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @unique @map("user_id") @db.Uuid
+  favoriteGenres String[] @default([]) @map("favorite_genres")
+  dislikedGenres String[] @default([]) @map("disliked_genres")
+  preferredMoods String[] @default([]) @map("preferred_moods")
+  minRating      Float?   @map("min_rating")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+// ─── Movie Enrichment Cache Model ─────────────────────
+
+model MovieEnrichmentCache {
+  id                       String   @id @default(uuid()) @db.Uuid
+  tmdbMovieId              Int      @unique @map("tmdb_movie_id")
+  themes                   String[] @default([])
+  tone                     String?  @db.VarChar(255)
+  pacing                   String?  @db.VarChar(100)
+  emotionAfterWatching     String?  @map("emotion_after_watching") @db.VarChar(255)
+  confidence               Float?
+  containsSensitiveContent Boolean  @default(false) @map("contains_sensitive_content")
+  sourceHash               String?  @map("source_hash") @db.VarChar(255)
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  @@index([tmdbMovieId])
+  @@map("movie_enrichment_cache")
+}
+
+// ─── Recommendation History Model ─────────────────────
+
+model RecommendationHistory {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  prompt            String   @db.Text
+  recommendedMovies Json     @map("recommended_movies")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("recommendation_histories")
+}
+
+// ─── Movie Recommendation Session Model ───────────────
+
+model MovieRecommendationSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  status    String   @default("active") @db.VarChar(50)
+  context   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("movie_recommendation_sessions")
+}
+
+// ─── Search History Model ─────────────────────────────
+
+model SearchHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  query     String   @db.VarChar(500)
+  category  String   @default("movie") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("search_histories")
+}
+
+// ─── Conversation Model ───────────────────────────────
+
+model Conversation {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  title     String?  @db.VarChar(255)
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("conversations")
+}
+
+// ─── Recommendation Request Model ─────────────────────
+
+model RecommendationRequest {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  prompt    String   @db.Text
+  options   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendationResponse RecommendationResponse?
+
+  @@index([userId])
+  @@map("recommendation_requests")
+}
+
+// ─── Recommendation Response Model ────────────────────
+
+model RecommendationResponse {
+  id        String   @id @default(uuid()) @db.Uuid
+  requestId String   @unique @map("request_id") @db.Uuid
+  data      Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  request RecommendationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("recommendation_responses")
+}
+
+// ─── Database API Cache Fallback Model ────────────────
+
+model ApiCache {
+  id        String   @id @default(uuid()) @db.Uuid
+  cacheKey  String   @unique @map("cache_key") @db.VarChar(500)
+  data      Json
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([cacheKey])
+  @@map("api_caches")
+}
