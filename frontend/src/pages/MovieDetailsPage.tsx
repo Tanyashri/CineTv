@@ -286,7 +286,7 @@ export function MovieDetailsPage() {
       </div>
 
       {/* ─── Main Details Grid Area ──────────────────────── */}
-      <div className="mx-auto max-w-[1200px] px-6 -mt-32 relative z-10 space-y-8">
+      <div className="w-full max-w-[1200px] mx-auto px-6 -mt-32 relative z-10 space-y-12">
         
         {/* Top Row: Poster Image & Primary Details Card */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
@@ -372,20 +372,20 @@ export function MovieDetailsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           
           {/* Left Side: Creators and Cast Card (2 Cols) */}
-          <div className="md:col-span-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-6 shadow-xl space-y-4">
-            <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">
+          <div className="md:col-span-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] shadow-xl space-y-4" style={{ padding: '28px' }}>
+            <h2 className="text-lg font-black text-white mb-6 tracking-tight">
               Creators and Cast
             </h2>
 
-            <div className="space-y-3.5 text-xs">
+            <div className="space-y-5 text-sm">
               {directors.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
-                  <span className="w-24 shrink-0 font-bold text-[var(--text-secondary)]">Directors</span>
-                  <span className="text-[var(--text-primary)] font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                  <span className="w-28 shrink-0 font-bold text-[var(--text-secondary)]">Directors</span>
+                  <span className="text-[var(--text-primary)] font-semibold">
                     {directors.map((d, i) => (
                       <React.Fragment key={d}>
                         {i > 0 && ', '}
-                        <span className="hover:underline cursor-pointer text-[var(--text-primary)] transition-colors">
+                        <span className="hover:underline cursor-pointer text-primary-400 hover:text-primary-300 transition-colors">
                           {d}
                         </span>
                       </React.Fragment>
@@ -395,13 +395,13 @@ export function MovieDetailsPage() {
               )}
 
               {producers.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
-                  <span className="w-24 shrink-0 font-bold text-[var(--text-secondary)]">Producers</span>
-                  <span className="text-[var(--text-primary)] font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                  <span className="w-28 shrink-0 font-bold text-[var(--text-secondary)]">Producers</span>
+                  <span className="text-[var(--text-primary)] font-semibold">
                     {producers.map((p, i) => (
                       <React.Fragment key={p}>
                         {i > 0 && ', '}
-                        <span className="hover:underline cursor-pointer text-[var(--text-primary)] transition-colors">
+                        <span className="hover:underline cursor-pointer text-primary-400 hover:text-primary-300 transition-colors">
                           {p}
                         </span>
                       </React.Fragment>
@@ -411,13 +411,13 @@ export function MovieDetailsPage() {
               )}
 
               {castList.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
-                  <span className="w-24 shrink-0 font-bold text-[var(--text-secondary)]">Cast</span>
-                  <span className="text-[var(--text-primary)] font-medium leading-relaxed">
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                  <span className="w-28 shrink-0 font-bold text-[var(--text-secondary)]">Cast</span>
+                  <span className="text-[var(--text-primary)] font-semibold leading-relaxed">
                     {castList.map((actor, i) => (
                       <React.Fragment key={actor}>
                         {i > 0 && ', '}
-                        <span className="hover:underline cursor-pointer text-[var(--text-primary)] transition-colors">
+                        <span className="hover:underline cursor-pointer text-primary-400 hover:text-primary-300 transition-colors">
                           {actor}
                         </span>
                       </React.Fragment>
@@ -427,9 +427,9 @@ export function MovieDetailsPage() {
               )}
 
               {studios.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
-                  <span className="w-24 shrink-0 font-bold text-[var(--text-secondary)]">Studio</span>
-                  <span className="text-[var(--text-secondary)] font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                  <span className="w-28 shrink-0 font-bold text-[var(--text-secondary)]">Studio</span>
+                  <span className="text-[var(--text-secondary)] font-semibold">
                     {studios.join(', ')}
                   </span>
                 </div>
@@ -441,40 +441,42 @@ export function MovieDetailsPage() {
           <div className="space-y-4 md:col-span-1">
             
             {/* Content Advisory Card */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-5 shadow-xl space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] shadow-xl space-y-3" style={{ padding: '24px' }}>
+              <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-muted)]">
                 Content advisory
               </h3>
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-6 px-2 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface-elevated)] text-[11px] font-black text-[var(--text-primary)]">
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 px-2.5 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface-elevated)] text-xs font-black text-white">
                   {advisory.rating}
                 </span>
-                <span className="text-xs text-[var(--text-secondary)] font-medium">{advisory.desc}</span>
+                <span className="text-sm text-[var(--text-secondary)] font-semibold">{advisory.desc}</span>
               </div>
             </div>
 
             {/* Audio Languages Card */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-5 shadow-xl space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] shadow-xl space-y-3" style={{ padding: '24px' }}>
+              <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-muted)]">
                 Audio languages
               </h3>
-              <div className="space-y-1.5">
-                <span className="inline-flex h-5 px-1.5 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface-elevated)] text-[10px] font-black text-[var(--text-primary)]">
-                  5.1
-                </span>
-                <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
+              <div className="flex flex-col gap-2.5">
+                <div>
+                  <span className="inline-flex h-6 px-2 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface-elevated)] text-[11px] font-black text-[var(--text-primary)]">
+                    5.1
+                  </span>
+                </div>
+                <p className="text-sm text-white font-semibold leading-relaxed">
                   {audioLangs}
                 </p>
               </div>
             </div>
 
             {/* Subtitles Card */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-5 shadow-xl space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] shadow-xl space-y-3" style={{ padding: '24px' }}>
+              <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-muted)]">
                 Subtitles
               </h3>
-              <div className="flex items-center gap-2 text-xs text-[var(--text-primary)] font-medium">
-                <span className="flex h-5 px-1.5 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface-elevated)] text-[10px] font-black text-[var(--text-primary)]">
+              <div className="flex items-center gap-3 text-sm text-white font-semibold">
+                <span className="flex h-6 px-2 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface-elevated)] text-[11px] font-black text-[var(--text-primary)]">
                   CC
                 </span>
                 <span>English [CC]</span>
@@ -482,14 +484,14 @@ export function MovieDetailsPage() {
             </div>
 
             {/* Where to Watch Section */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-5 shadow-xl space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-primary)]">
-                <Tv className="h-4 w-4 text-amber-400" />
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] shadow-xl space-y-4" style={{ padding: '24px' }}>
+              <div className="flex items-center gap-2.5 text-sm font-bold text-white">
+                <Tv className="h-5 w-5 text-amber-400" />
                 <span>Where to Watch ({userRegion})</span>
               </div>
 
               {!hasAnyProviders ? (
-                <p className="text-xs text-[var(--text-secondary)]">Not yet available in your region.</p>
+                <p className="text-xs text-[var(--text-secondary)] font-medium">Not yet available in your region.</p>
               ) : (
                 <div className="space-y-3 pt-1">
                   {flatrate.length > 0 && (

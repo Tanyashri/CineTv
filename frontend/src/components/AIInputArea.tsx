@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Send, AlertCircle, X, RotateCcw } from 'lucide-react';
 import { frontendVoiceService, type VoiceState } from '../services/voice.service';
 import type { RecommendationModeId } from '../contexts/theme.context';
+import { BorderGlow } from './ui';
 
 export interface AIInputAreaProps {
   onSubmitPrompt: (promptText: string) => void;
@@ -105,10 +106,10 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
   };
 
   return (
-    <div className="w-full max-w-[780px] mx-auto space-y-4 flex flex-col items-center">
+    <div className="w-full max-w-[850px] mx-auto flex flex-col items-center gap-6">
       {/* Voice Error Alert Banner */}
       {voiceErrorMessage && (
-        <div className="w-full flex items-center justify-between rounded-xl border border-red-500/30 bg-red-950/30 px-4 py-2.5 text-xs text-red-300 backdrop-blur-md">
+        <div className="w-full flex items-center justify-between rounded-xl border border-red-500/30 bg-red-950/30 px-4 py-2.5 text-xs text-red-300 backdrop-blur-md mb-3">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
             <span>{voiceErrorMessage}</span>
@@ -117,14 +118,14 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={toggleVoice}
-              className="flex items-center gap-1 rounded bg-red-500/20 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-red-500 transition-colors"
+              className="flex items-center gap-1 rounded bg-red-500/20 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-red-500 transition-colors cursor-pointer"
             >
               <RotateCcw className="h-3 w-3" />
               <span>Try Again</span>
             </button>
             <button
               onClick={() => setVoiceErrorMessage(null)}
-              className="text-red-400 hover:text-white p-0.5"
+              className="text-red-400 hover:text-white p-0.5 cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -133,7 +134,7 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
       )}
 
       {/* ─── Centered Transparent Glassmorphic AI Prompt Card ─── */}
-      <div className="prompt-glass-bubble relative w-full rounded-3xl p-5 overflow-hidden">
+      <div className="prompt-glass-bubble relative w-full h-[135px] rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between border border-[var(--border)] mt-0">
         <textarea
           ref={textareaRef}
           value={prompt}
@@ -144,13 +145,13 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
               ? voiceInterim || '🔴 Listening... Speak your prompt into the microphone'
               : 'Tell me what you feel like watching...'
           }
-          rows={3}
-          className="w-full resize-none bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none leading-relaxed"
+          className="w-full flex-1 resize-none bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none leading-relaxed"
+          style={{ padding: '16px 16px 10px 16px' }}
         />
 
         {/* Live Speech Overlay */}
         {isRecording && (
-          <div className="mb-3 flex items-center justify-between px-3 py-1.5 rounded-lg bg-surface-800/60 border border-primary-500/40">
+          <div className="absolute inset-x-0 bottom-[48px] flex items-center justify-between px-4 py-2 bg-[var(--surface-card)]/90 border-t border-b border-primary-500/40 z-10 backdrop-blur-md">
             <div className="flex items-center gap-2 text-xs font-semibold text-primary-400">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
@@ -163,7 +164,7 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
 
             <button
               onClick={toggleVoice}
-              className="text-[10px] font-bold text-slate-300 hover:text-white bg-surface-700 px-2 py-0.5 rounded border border-[var(--border)] shrink-0 ml-2"
+              className="text-[10px] font-bold text-slate-300 hover:text-white bg-[var(--surface-elevated)] px-2.5 py-1 rounded border border-[var(--border)] shrink-0 ml-2 cursor-pointer"
             >
               Stop Mic
             </button>
@@ -171,16 +172,16 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
         )}
 
         {/* Bottom Actions Row: Voice & Ask AI */}
-        <div className="flex items-center justify-between border-t border-[var(--border)] pt-3 mt-1">
+        <div className="flex items-center justify-between border-t border-[var(--border)] p-[6px_12px] h-[48px] shrink-0">
           {/* Voice Button */}
           <button
             onClick={toggleVoice}
             type="button"
             title={isRecording ? 'Stop Listening' : 'Speak Prompt'}
-            className={`flex items-center gap-2 rounded-xl border border-[var(--border)] px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-2 rounded-xl border border-[var(--border)] px-4 h-9 text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
               isRecording
                 ? 'bg-primary-500 text-white shadow-md animate-pulse border-primary-400'
-                : 'bg-surface-800/60 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/40'
+                : 'bg-[var(--surface-card)]/65 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/40'
             }`}
           >
             {isRecording ? <MicOff className="h-4 w-4 text-white" /> : <Mic className="h-4 w-4 text-primary-500" />}
@@ -192,27 +193,38 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
             onClick={handleSend}
             type="button"
             disabled={isLoading || (!prompt.trim() && !voiceInterim.trim())}
-            className="btn-primary py-1.5 px-5 text-xs font-bold shadow-lg shadow-primary-500/25 disabled:opacity-50"
+            className="btn-primary px-6 h-9 text-xs font-bold shadow-lg shadow-primary-500/25 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
           >
-            <span>{isLoading ? 'Finding your recommendations...' : 'Ask AI'}</span>
-            {!isLoading && <Send className="h-3.5 w-3.5 ml-1" />}
+            <span>{isLoading ? 'Finding recommendations...' : 'Ask AI'}</span>
+            {!isLoading && <Send className="h-3.5 w-3.5 ml-1.5" />}
           </button>
         </div>
       </div>
 
       {/* ─── Centered Transparent Glass Quick Prompt Chips ─── */}
-      <div className="flex flex-wrap items-center justify-center gap-2 pt-1 w-full">
+      <div className="flex flex-wrap items-center justify-center gap-3 w-full">
         {QUICK_PROMPTS.map((chip) => (
-          <button
+          <BorderGlow
             key={chip.label}
-            onClick={() => {
-              setPrompt(chip.prompt);
-              onSubmitPrompt(chip.prompt);
-            }}
-            className="rounded-full border border-[var(--border)] bg-surface-900/40 px-3.5 py-1.5 text-xs font-medium text-[var(--text-secondary)] backdrop-blur-sm transition-all hover:border-primary-500/50 hover:bg-primary-500/10 hover:text-[var(--text-primary)]"
+            borderRadius={12}
+            glowColor="357 92 47"
+            glowRadius={25}
+            glowIntensity={1.2}
+            edgeSensitivity={30}
+            backgroundColor="rgba(24, 24, 27, 0.6)"
+            colors={['#ef4444', '#b91c1c', '#f87171']}
+            className="flex items-center justify-center"
           >
-            {chip.label}
-          </button>
+            <button
+              onClick={() => {
+                setPrompt(chip.prompt);
+                onSubmitPrompt(chip.prompt);
+              }}
+              className="px-4 h-11 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer flex items-center justify-center py-2.5 leading-normal bg-transparent border-0 rounded-none w-full"
+            >
+              {chip.label}
+            </button>
+          </BorderGlow>
         ))}
       </div>
     </div>

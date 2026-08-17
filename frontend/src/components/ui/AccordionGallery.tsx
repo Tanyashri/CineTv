@@ -47,6 +47,7 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({ movies, genr
             <motion.div
               layout
               key={movie.id}
+              onMouseEnter={() => setActiveIndex(index)}
               onClick={() => handleItemClick(index, movie.id)}
               className={`relative overflow-hidden rounded-2xl border cursor-pointer group transition-all duration-500 ease-out ${
                 isExpanded

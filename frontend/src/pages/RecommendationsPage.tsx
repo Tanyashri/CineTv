@@ -11,7 +11,7 @@ import { ErrorState } from '../components/ui/ErrorState';
 import { motion } from 'framer-motion';
 import { SplitText } from '../components/ui/SplitText';
 
-const LANGUAGE_OPTIONS = [
+export const LANGUAGE_OPTIONS = [
   { id: 'en', label: 'English' },
   { id: 'hi', label: 'Hindi' },
   { id: 'kn', label: 'Kannada' },
@@ -32,7 +32,7 @@ const LANGUAGE_OPTIONS = [
   { id: 'ar', label: 'Arabic' },
 ];
 
-const MODE_SELECT_OPTIONS = [
+export const MODE_SELECT_OPTIONS = [
   { id: 'all', label: 'All Modes', prompt: '' },
   { id: 'comfort', label: 'Comfort Cinema', prompt: 'I need a cozy, soothing, stress-free comfort movie.' },
   { id: 'feel-good', label: 'Feel Good', prompt: 'Give me a wholesome, uplifting feel-good movie that leaves me smiling.' },
@@ -61,7 +61,10 @@ export function RecommendationsPage() {
   } = useRecommendation();
 
   const [prompt, setPrompt] = useState<string>('');
-  const [selectedMode, setSelectedMode] = useState<string>('all');
+  const [selectedMode, setSelectedMode] = useState<string>(() => {
+    const navState = location.state as { initialPrompt?: string; initialMode?: string } | null;
+    return navState?.initialMode || 'all';
+  });
   const [candidates, setCandidates] = useState<RecommendationCandidate[]>([]);
   const [detectedEmotion, setDetectedEmotion] = useState<string>('');
   const [predictedOutcome, setPredictedOutcome] = useState<string>('');
@@ -163,14 +166,17 @@ export function RecommendationsPage() {
 
   // Check URL parameters or location state
   useEffect(() => {
-    const navState = location.state as { initialPrompt?: string } | null;
+    const navState = location.state as { initialPrompt?: string; initialMode?: string } | null;
     const queryParams = new URLSearchParams(location.search);
     const modeParam = queryParams.get('mode');
 
     if (navState?.initialPrompt) {
+      if (navState.initialMode) {
+        setSelectedMode(navState.initialMode);
+      }
       // Clear history state immediately to prevent re-triggering on re-renders
       window.history.replaceState({}, document.title, location.pathname + location.search);
-      handleExecuteRecommendation(navState.initialPrompt);
+      handleExecuteRecommendation(navState.initialPrompt, navState.initialMode);
     } else if (modeParam === 'hidden-gems') {
       setSelectedMode('hidden-gems');
       handleExecuteRecommendation('Find underrated hidden gem movies that deserve recognition.', 'Hidden Gems');
@@ -265,32 +271,32 @@ export function RecommendationsPage() {
       </div>
 
       {/* ─── 2. Centered Prompt & Controls Toolbar ──────── */}
-      <div className="space-y-4 w-full flex flex-col items-center">
+      <div className="w-full max-w-[780px] mx-auto flex flex-col gap-6 items-center">
         <AIInputArea onSubmitPrompt={(q) => handleExecuteRecommendation(q)} isLoading={isLoading} />
 
         {/* Centered Controls Toolbar: Mode ▼ & Language ▼ & Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[780px] mx-auto pt-1">
+        <div className="flex flex-wrap items-center justify-center gap-3 w-full">
           {/* Mode Selector Dropdown */}
-          <div className="relative flex items-center">
+          <div className="relative flex items-center justify-center">
             <select
               value={selectedMode}
               onChange={handleModeChange}
-              className="appearance-none rounded-xl border border-[var(--border)] bg-surface-900/60 px-4 py-2 pr-9 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/60 outline-none cursor-pointer backdrop-blur-sm transition-all shadow-sm"
+              className="appearance-none rounded-xl border border-[var(--border)] bg-[var(--surface-card)]/60 hover:bg-[var(--surface-card)]/90 pl-5 pr-10 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/60 outline-none cursor-pointer backdrop-blur-sm transition-all shadow-sm text-center py-2 leading-[1.3]"
             >
               {MODE_SELECT_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id} className="bg-surface-900 text-white">
+                <option key={opt.id} value={opt.id} className="bg-[var(--surface)] text-[var(--text-primary)]">
                   Recommendation Mode: {opt.label}
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 h-4 w-4 text-[var(--text-muted)]" />
+            <ChevronDown className="pointer-events-none absolute right-4 h-4 w-4 text-[var(--text-muted)]" />
           </div>
 
           {/* Language Dropdown Selector */}
-          <div className="relative" ref={languageDropdownRef}>
+          <div className="relative flex items-center justify-center" ref={languageDropdownRef}>
             <button
               onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-              className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-surface-900/60 px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/60 outline-none cursor-pointer backdrop-blur-sm transition-all shadow-sm"
+              className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-card)]/60 hover:bg-[var(--surface-card)]/90 px-5 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/60 outline-none cursor-pointer backdrop-blur-sm transition-all shadow-sm leading-[1.3] py-2"
             >
               <span>
                 Language:{' '}
@@ -304,28 +310,28 @@ export function RecommendationsPage() {
             </button>
 
             {isLanguageDropdownOpen && (
-              <div className="absolute top-full mt-2 w-60 max-h-64 overflow-y-auto rounded-xl border border-surface-700 bg-surface-950 p-2.5 shadow-2xl z-50 backdrop-blur-md space-y-1 scrollbar-thin">
-                <label className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-surface-800 cursor-pointer text-xs font-bold text-slate-200 select-none">
+              <div className="absolute top-full mt-2 w-60 max-h-64 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface)] p-2.5 shadow-2xl z-50 backdrop-blur-md space-y-1 scrollbar-thin">
+                <label className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-elevated)] cursor-pointer text-xs font-bold text-[var(--text-primary)] select-none">
                   <input
                     type="checkbox"
                     checked={selectedLanguages.includes('auto')}
                     onChange={() => handleLanguageToggle('auto')}
-                    className="rounded border-surface-700 text-primary-500 focus:ring-0 cursor-pointer h-4 w-4 bg-surface-900"
+                    className="rounded border-[var(--border)] text-primary-500 focus:ring-0 cursor-pointer h-4 w-4 bg-[var(--surface-card)]"
                   />
                   <span>Auto / Recommended</span>
                 </label>
-                <div className="border-t border-surface-800 my-1" />
+                <div className="border-t border-[var(--border)] my-1" />
                 <div className="grid grid-cols-1 gap-0.5">
                   {LANGUAGE_OPTIONS.map((lang) => (
                     <label
                       key={lang.id}
-                      className="flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-surface-800 cursor-pointer text-xs text-slate-300 select-none"
+                      className="flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-[var(--surface-elevated)] cursor-pointer text-xs text-[var(--text-secondary)] select-none"
                     >
                       <input
                         type="checkbox"
                         checked={selectedLanguages.includes(lang.id)}
                         onChange={() => handleLanguageToggle(lang.id)}
-                        className="rounded border-surface-700 text-primary-500 focus:ring-0 cursor-pointer h-4 w-4 bg-surface-900"
+                        className="rounded border-[var(--border)] text-primary-500 focus:ring-0 cursor-pointer h-4 w-4 bg-[var(--surface-card)]"
                       />
                       <span>{lang.label}</span>
                     </label>
@@ -336,18 +342,20 @@ export function RecommendationsPage() {
           </div>
 
           {/* Filters Button */}
-          <button
-            onClick={() => setIsTriggerPanelOpen(true)}
-            className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-surface-900/60 px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/60 backdrop-blur-sm transition-all shadow-sm"
-          >
-            <Filter className="h-4 w-4 text-primary-500" />
-            <span>Filters</span>
-            {activeTriggers.length > 0 && (
-              <span className="ml-1 rounded-full bg-primary-500 px-2 py-0.5 text-[10px] font-extrabold text-white">
-                {activeTriggers.length}
-              </span>
-            )}
-          </button>
+          <div className="relative flex items-center justify-center">
+            <button
+              onClick={() => setIsTriggerPanelOpen(true)}
+              className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-card)]/60 hover:bg-[var(--surface-card)]/90 px-5 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/60 backdrop-blur-sm transition-all shadow-sm cursor-pointer leading-[1.3] py-2"
+            >
+              <Filter className="h-4 w-4 text-primary-500" />
+              <span>Filters</span>
+              {activeTriggers.length > 0 && (
+                <span className="ml-1 rounded-full bg-primary-500 px-2 py-0.5 text-[10px] font-extrabold text-white">
+                  {activeTriggers.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -50,7 +50,7 @@ export function FavoritesPage() {
   }, [favorites]);
 
   return (
-    <div className="mx-auto max-w-[1200px] px-6 py-8 space-y-8">
+    <div className="w-full max-w-[1200px] mx-auto px-6 py-8 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
@@ -74,7 +74,7 @@ export function FavoritesPage() {
           icon={<Heart className="h-8 w-8 text-rose-500" />}
         />
       ) : (
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
           {movies.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
           ))}

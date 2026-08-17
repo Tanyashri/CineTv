@@ -59,73 +59,75 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12">
+    <div className="flex h-full min-h-0 items-center justify-center px-6 py-6 overflow-y-auto w-full scrollbar-thin">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="glass w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-xl"
+        className="glass w-full max-w-[460px] rounded-3xl p-8 sm:p-10 shadow-2xl"
       >
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600/20 text-primary-400 border border-primary-500/30">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600/10 text-primary-400 border border-primary-500/20">
             <UserPlus className="h-6 w-6" />
           </div>
-          <h2 className="mt-3 text-xl sm:text-2xl font-bold tracking-tight text-white">Create Account</h2>
-          <p className="mt-1 text-xs text-slate-400">Join CineVerse AI for personalized movie recommendations</p>
+          <h2 className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-white">Create Account</h2>
+          <p className="mt-2 text-sm text-slate-400">Join CineVerse AI for personalized movie recommendations</p>
         </div>
 
         {error && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="mt-4 flex items-center gap-2.5 rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-xs text-red-400"
+            className="mt-6 flex items-center gap-2.5 rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-xs text-red-400"
           >
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
               Full Name
             </label>
             <div className="relative">
-              <UserIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <UserIcon className="absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" style={{ left: '16px' }} />
               <input
                 type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Jane Doe"
-                className="w-full rounded-xl border border-surface-600 bg-surface-800/90 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-primary-500 outline-none transition-all"
+                className="w-full rounded-xl border border-surface-600 bg-surface-800/90 h-12 pr-4 text-sm sm:text-base text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-primary-500 outline-none transition-all"
+                style={{ paddingLeft: '48px' }}
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Mail className="absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" style={{ left: '16px' }} />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-surface-600 bg-surface-800/90 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-primary-500 outline-none transition-all"
+                className="w-full rounded-xl border border-surface-600 bg-surface-800/90 h-12 pr-4 text-sm sm:text-base text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-primary-500 outline-none transition-all"
+                style={{ paddingLeft: '48px' }}
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
               Password (min 8 characters)
             </label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Lock className="absolute top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" style={{ left: '16px' }} />
               <input
                 type="password"
                 required
@@ -133,7 +135,8 @@ export function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-surface-600 bg-surface-800/90 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-primary-500 outline-none transition-all"
+                className="w-full rounded-xl border border-surface-600 bg-surface-800/90 h-12 pr-4 text-sm sm:text-base text-white placeholder-slate-500 focus-visible:ring-2 focus-visible:ring-primary-500 outline-none transition-all"
+                style={{ paddingLeft: '48px' }}
               />
             </div>
           </div>
@@ -141,28 +144,28 @@ export function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-primary py-2.5 font-bold text-xs sm:text-sm disabled:opacity-50"
+            className="w-full btn-primary h-12 font-bold text-sm sm:text-base disabled:opacity-50 mt-2 shadow-lg shadow-primary-500/25 cursor-pointer"
           >
             {isLoading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
             ) : (
               'Sign Up'
             )}
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3">
+        <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-surface-700"></div>
-          <span className="text-[11px] uppercase text-slate-500 font-semibold">or</span>
+          <span className="text-[11px] uppercase text-slate-500 font-bold tracking-wider">or</span>
           <div className="h-px flex-1 bg-surface-700"></div>
         </div>
 
         <button
           type="button"
           onClick={handleGoogleSignIn}
-          className="w-full btn-secondary py-2.5 font-semibold text-xs sm:text-sm"
+          className="w-full btn-secondary h-12 font-bold text-sm sm:text-base flex items-center justify-center gap-3 cursor-pointer"
         >
-          <svg className="h-4 w-4" viewBox="0 0 24 24">
+          <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
               d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
@@ -183,9 +186,9 @@ export function RegisterPage() {
           Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-xs text-slate-400">
+        <p className="mt-8 text-center text-sm text-slate-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-primary-400 hover:text-primary-300">
+          <Link to="/login" className="font-bold text-primary-400 hover:text-primary-300 transition-colors">
             Sign in
           </Link>
         </p>

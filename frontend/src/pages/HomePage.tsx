@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DomeGallery } from '../components/ui';
+import { DomeGallery, BorderGlow } from '../components/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AIInputArea } from '../components/AIInputArea';
 import { tmdbService, type TmdbMovieItem } from '../services/tmdb.service';
 import { MovieCard } from '../components/MovieCard';
+import { Filter, ChevronDown } from 'lucide-react';
+import { useRecommendation } from '../contexts/recommendation.context';
+import { useAuth } from '../contexts/auth.context';
+import { LANGUAGE_OPTIONS, MODE_SELECT_OPTIONS } from './RecommendationsPage';
 
 const FALLBACK_MOVIE_POSTERS = [
   'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=80',
@@ -20,11 +24,117 @@ const FALLBACK_MOVIE_POSTERS = [
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [trending, setTrending] = useState<TmdbMovieItem[]>([]);
   const [popular, setPopular] = useState<TmdbMovieItem[]>([]);
 
-  const handleSubmitPrompt = (promptText: string) => {
-    navigate('/recommendations', { state: { initialPrompt: promptText } });
+  const trendingRowRef = useRef<HTMLDivElement>(null);
+  const popularRowRef = useRef<HTMLDivElement>(null);
+
+  const { activeTriggers, setIsTriggerPanelOpen } = useRecommendation();
+
+  const [selectedMode, setSelectedMode] = useState<string>('all');
+  const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
+  const modeDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('cinetv_recommendation_language');
+      return saved ? JSON.parse(saved) : ['auto'];
+    } catch {
+      return ['auto'];
+    }
+  });
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const languageDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem('cinetv_recommendation_language', JSON.stringify(selectedLanguages));
+  }, [selectedLanguages]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+        setIsLanguageDropdownOpen(false);
+      }
+      if (modeDropdownRef.current && !modeDropdownRef.current.contains(event.target as Node)) {
+        setIsModeDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLanguageToggle = (langId: string) => {
+    if (langId === 'auto') {
+      setSelectedLanguages(['auto']);
+      return;
+    }
+
+    let next = selectedLanguages.filter((id) => id !== 'auto');
+    if (next.includes(langId)) {
+      next = next.filter((id) => id !== langId);
+    } else {
+      next.push(langId);
+    }
+
+    if (next.length === 0) {
+      next = ['auto'];
+    }
+    setSelectedLanguages(next);
+  };
+
+  const getLanguageLabel = (code: string): string => {
+    const matched = LANGUAGE_OPTIONS.find((o) => o.id === code);
+    return matched ? matched.label : code.toUpperCase();
+  };
+
+  const handleSelectMode = (modeId: string) => {
+    setSelectedMode(modeId);
+    setIsModeDropdownOpen(false);
+    const matchedObj = MODE_SELECT_OPTIONS.find((m) => m.id === modeId);
+    if (matchedObj && matchedObj.prompt) {
+      handleSubmitPrompt(matchedObj.prompt, modeId);
+    }
+  };
+
+  // Translate vertical scroll wheel movements to horizontal scroll inside movie rows
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        const container = e.currentTarget as HTMLDivElement;
+        container.scrollLeft += e.deltaY * 1.2;
+      }
+    };
+
+    const trendingEl = trendingRowRef.current;
+    const popularEl = popularRowRef.current;
+
+    if (trendingEl) {
+      trendingEl.addEventListener('wheel', handleWheel, { passive: false });
+    }
+    if (popularEl) {
+      popularEl.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    return () => {
+      if (trendingEl) {
+        trendingEl.removeEventListener('wheel', handleWheel);
+      }
+      if (popularEl) {
+        popularEl.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, [trending, popular]);
+
+  const handleSubmitPrompt = (promptText: string, modeOverride?: string) => {
+    navigate('/recommendations', {
+      state: {
+        initialPrompt: promptText,
+        initialMode: modeOverride || selectedMode,
+      },
+    });
   };
 
   // Temporarily set to true on mount for debugging (ignores localStorage until confirmed working)
@@ -42,6 +152,9 @@ export function HomePage() {
     setIsIntroActive(false);
     // Clear URL query parameters to prevent replaying on page reload
     window.history.replaceState({}, document.title, '/');
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
   };
 
   // Load category feeds & TMDb intro posters on mount
@@ -98,6 +211,8 @@ export function HomePage() {
       return () => clearTimeout(timer);
     }
   }, [isIntroActive]);
+
+  const selectedModeLabel = MODE_SELECT_OPTIONS.find((o) => o.id === selectedMode)?.label || 'All Modes';
 
   return (
     <>
@@ -161,21 +276,157 @@ export function HomePage() {
         initial={isIntroActive ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
         animate={!isIntroActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
         transition={{ duration: 1.0, ease: 'easeOut' }}
-        className="w-full max-w-[1200px] mx-auto px-6 py-12 flex flex-col items-center space-y-16"
+        className="w-full max-w-[1200px] mx-auto px-6 py-6 flex flex-col items-center space-y-10"
       >
         {/* ─── Hero & AI Prompt Bar Section ───────────────── */}
-        <div className="w-full flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8 select-none">
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--text-primary)]">
+        <div className="w-full flex flex-col items-center text-center select-none pt-12 pb-6">
+          <div className="flex flex-col items-center">
+            <h1 className="text-4xl sm:text-5xl md:text-[54px] font-bold tracking-tight text-[var(--text-primary)] leading-[1.1]">
               Your Next Story Starts Here
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--text-secondary)] font-medium max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 text-xs sm:text-sm md:text-base text-[var(--text-secondary)] font-medium max-w-xl mx-auto leading-relaxed">
               Tell CineTV what you're in the mood for, and we'll find movies that fit.
             </p>
           </div>
 
-          <div className="w-full flex justify-center animate-float">
+          <div className="w-full max-w-[780px] mx-auto flex flex-col items-center animate-float mt-6">
             <AIInputArea onSubmitPrompt={handleSubmitPrompt} isLoading={false} />
+
+            {/* Centered Controls Toolbar: Mode ▼ & Language ▼ & Filters */}
+            <div className="flex flex-wrap items-center justify-center gap-3 w-full" style={{ marginTop: '14px' }}>
+              {/* Mode Selector Dropdown */}
+              <div className="relative flex items-center justify-center" ref={modeDropdownRef}>
+                <BorderGlow
+                  borderRadius={12}
+                  glowColor="357 92 47"
+                  glowRadius={25}
+                  glowIntensity={1.2}
+                  edgeSensitivity={30}
+                  backgroundColor="rgba(24, 24, 27, 0.6)"
+                  colors={['#ef4444', '#b91c1c', '#f87171']}
+                  className="flex items-center justify-center"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsModeDropdownOpen(!isModeDropdownOpen)}
+                    className="flex items-center justify-center gap-2 px-4 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal py-2.5 bg-transparent border-0 rounded-none w-full"
+                  >
+                    <span>Recommendation Mode: {selectedModeLabel}</span>
+                    <ChevronDown className={`h-4 w-4 text-[var(--text-muted)] transition-transform duration-200 ${isModeDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                </BorderGlow>
+
+                {isModeDropdownOpen && (
+                  <div className="absolute bottom-full mb-2 w-64 max-h-64 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface)] p-2.5 shadow-2xl z-50 backdrop-blur-md space-y-1 scrollbar-thin">
+                    <div className="grid grid-cols-1 gap-0.5">
+                      {MODE_SELECT_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => handleSelectMode(opt.id)}
+                          className={`w-full text-left px-3 py-2 rounded-lg hover:bg-[var(--surface-elevated)] cursor-pointer text-xs font-bold transition-colors ${
+                            selectedMode === opt.id
+                              ? 'text-primary-500 bg-primary-500/10'
+                              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Language Dropdown Selector */}
+              <div className="relative flex items-center justify-center" ref={languageDropdownRef}>
+                <BorderGlow
+                  borderRadius={12}
+                  glowColor="357 92 47"
+                  glowRadius={25}
+                  glowIntensity={1.2}
+                  edgeSensitivity={30}
+                  backgroundColor="rgba(24, 24, 27, 0.6)"
+                  colors={['#ef4444', '#b91c1c', '#f87171']}
+                  className="flex items-center justify-center"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                    className="flex items-center justify-center gap-2 px-4 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal py-2.5 bg-transparent border-0 rounded-none w-full"
+                  >
+                    <span>
+                      Language:{' '}
+                      {selectedLanguages.includes('auto')
+                        ? 'Auto'
+                        : selectedLanguages.length === 1
+                        ? getLanguageLabel(selectedLanguages[0] || 'auto')
+                        : `${selectedLanguages.length} selected`}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-[var(--text-muted)] transition-transform duration-200 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                </BorderGlow>
+
+                {isLanguageDropdownOpen && (
+                  <div className="absolute bottom-full mb-2 w-60 max-h-64 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface)] p-2.5 shadow-2xl z-50 backdrop-blur-md space-y-1 scrollbar-thin">
+                    <label className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-[var(--surface-elevated)] cursor-pointer text-xs font-bold text-[var(--text-primary)] select-none">
+                      <input
+                        type="checkbox"
+                        checked={selectedLanguages.includes('auto')}
+                        onChange={() => handleLanguageToggle('auto')}
+                        className="rounded border-[var(--border)] text-primary-500 focus:ring-0 cursor-pointer h-4 w-4 bg-[var(--surface-card)]"
+                      />
+                      <span>Auto / Recommended</span>
+                    </label>
+                    <div className="border-t border-[var(--border)] my-1" />
+                    <div className="grid grid-cols-1 gap-0.5">
+                      {LANGUAGE_OPTIONS.map((lang) => (
+                        <label
+                          key={lang.id}
+                          className="flex items-center gap-2.5 px-2 py-1 rounded-lg hover:bg-[var(--surface-elevated)] cursor-pointer text-xs text-[var(--text-secondary)] select-none"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedLanguages.includes(lang.id)}
+                            onChange={() => handleLanguageToggle(lang.id)}
+                            className="rounded border-[var(--border)] text-primary-500 focus:ring-0 cursor-pointer h-4 w-4 bg-[var(--surface-card)]"
+                          />
+                          <span>{lang.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Filters Button */}
+              <div className="relative flex items-center justify-center">
+                <BorderGlow
+                  borderRadius={12}
+                  glowColor="357 92 47"
+                  glowRadius={25}
+                  glowIntensity={1.2}
+                  edgeSensitivity={30}
+                  backgroundColor="rgba(24, 24, 27, 0.6)"
+                  colors={['#ef4444', '#b91c1c', '#f87171']}
+                  className="flex items-center justify-center"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsTriggerPanelOpen(true)}
+                    className="flex items-center justify-center gap-2 px-4 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal py-2.5 bg-transparent border-0 rounded-none w-full"
+                  >
+                    <Filter className="h-4 w-4 text-primary-500" />
+                    <span>Filters</span>
+                    {activeTriggers.length > 0 && (
+                      <span className="ml-1 rounded-full bg-primary-500 px-2 py-0.5 text-[10px] font-extrabold text-white">
+                        {activeTriggers.length}
+                      </span>
+                    )}
+                  </button>
+                </BorderGlow>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -183,7 +434,7 @@ export function HomePage() {
         {trending.length > 0 && (
           <div className="w-full space-y-4">
             <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Trending Movies</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory">
+            <div ref={trendingRowRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
               {trending.slice(0, 10).map((movie) => (
                 <div key={movie.id} className="w-40 sm:w-44 shrink-0 snap-start">
                   <MovieCard movie={movie} />
@@ -197,7 +448,7 @@ export function HomePage() {
         {popular.length > 0 && (
           <div className="w-full space-y-4 pb-8">
             <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Popular Movies</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory">
+            <div ref={popularRowRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
               {popular.slice(0, 10).map((movie) => (
                 <div key={movie.id} className="w-40 sm:w-44 shrink-0 snap-start">
                   <MovieCard movie={movie} />

@@ -19,7 +19,7 @@ export function SettingsPage() {
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
-    <div className="mx-auto max-w-[1200px] px-6 py-8 space-y-8">
+    <div className="w-full max-w-[1200px] mx-auto px-6 py-8 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">

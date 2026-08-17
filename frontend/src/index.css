@@ -265,6 +265,12 @@ html.light .btn-secondary:hover {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.prompt-glass-bubble textarea {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .prompt-glass-bubble:hover {
   border-color: rgba(229, 9, 20, 0.35) !important;
   box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(229, 9, 20, 0.15) !important;

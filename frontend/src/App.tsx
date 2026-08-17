@@ -60,12 +60,20 @@ export default function App() {
             }
           />
           <Route
+            path="/signin"
+            element={<Navigate to="/login" replace />}
+          />
+          <Route
             path="/register"
             element={
               <AnonymousOnlyRoute>
                 <RegisterPage />
               </AnonymousOnlyRoute>
             }
+          />
+          <Route
+            path="/signup"
+            element={<Navigate to="/register" replace />}
           />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
