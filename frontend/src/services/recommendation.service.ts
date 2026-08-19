@@ -87,10 +87,14 @@ export interface RecommendationHistoryItem {
 
 export class FrontendRecommendationService {
   async prepareRecommendations(prompt: string, options?: RecommendationRequestOptions): Promise<PrepareDataResult> {
-    const response = await apiClient.post<ApiResponse<PrepareDataResult>>('/recommendations/prepare', {
-      prompt,
-      ...options,
-    });
+    const response = await apiClient.post<ApiResponse<PrepareDataResult>>(
+      '/recommendations/prepare',
+      {
+        prompt,
+        ...options,
+      },
+      { timeout: 45_000 },
+    );
     return response.data.data;
   }
 

@@ -151,7 +151,7 @@ export class RecommendationOrchestrator {
           !cleanIp.startsWith('172.31.')
         ) {
           try {
-            const res = await fetch(`http://ip-api.com/json/${cleanIp}`);
+            const res = await fetch(`http://ip-api.com/json/${cleanIp}`, { signal: AbortSignal.timeout(1500) });
             const data = await res.json() as { status: string; countryCode: string };
             if (data && data.status === 'success' && data.countryCode) {
               detectedCountry = data.countryCode;
