@@ -21,22 +21,61 @@ export const CinematicBackground: React.FC = () => {
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none transition-colors duration-500 bg-[var(--background)]"
     >
       {/* ─── Soft Ambient Cinematic Red Glow Orbs ─── */}
-      <div
-        className="absolute -top-32 left-1/4 h-[600px] w-[600px] rounded-full blur-[140px] opacity-40 dark:opacity-50 transition-all duration-700"
+      <motion.div
+        animate={shouldReduceMotion ? {} : {
+          x: [0, 40, -20, 0],
+          y: [0, -30, 40, 0],
+          scale: [1, 1.1, 0.95, 1],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute -top-32 left-1/4 h-[600px] w-[600px] rounded-full blur-[140px] opacity-40 dark:opacity-50 pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(229, 9, 20, 0.35) 0%, rgba(229, 9, 20, 0) 70%)' }}
       />
-      <div
-        className="absolute top-1/3 -right-32 h-[650px] w-[650px] rounded-full blur-[160px] opacity-30 dark:opacity-40 transition-all duration-700"
+      <motion.div
+        animate={shouldReduceMotion ? {} : {
+          x: [0, -30, 30, 0],
+          y: [0, 40, -30, 0],
+          scale: [1, 0.95, 1.1, 1],
+        }}
+        transition={{
+          duration: 28,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-1/3 -right-32 h-[650px] w-[650px] rounded-full blur-[160px] opacity-30 dark:opacity-40 pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(229, 9, 20, 0.28) 0%, rgba(229, 9, 20, 0) 70%)' }}
       />
-      <div
-        className="absolute -bottom-32 left-1/3 h-[600px] w-[600px] rounded-full blur-[150px] opacity-35 dark:opacity-45 transition-all duration-700"
+      <motion.div
+        animate={shouldReduceMotion ? {} : {
+          x: [0, 20, -30, 0],
+          y: [0, 25, -20, 0],
+          scale: [1, 1.05, 0.95, 1],
+        }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute -bottom-32 left-1/3 h-[600px] w-[600px] rounded-full blur-[150px] opacity-35 dark:opacity-45 pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(178, 7, 16, 0.3) 0%, rgba(178, 7, 16, 0) 70%)' }}
       />
 
       {/* ─── Projector Light Beam Atmosphere ─── */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 h-[800px] w-[1000px] blur-[120px] opacity-20 dark:opacity-25 transition-opacity duration-500"
+      <motion.div
+        animate={shouldReduceMotion ? {} : {
+          opacity: [0.16, 0.24, 0.16],
+          scale: [1, 1.03, 1],
+        }}
+        transition={{
+          duration: 16,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 h-[800px] w-[1000px] blur-[120px] pointer-events-none"
         style={{
           background: 'conic-gradient(from 180deg at 50% 0%, rgba(255,255,255,0.08) 0deg, rgba(229,9,20,0.18) 60deg, rgba(0,0,0,0) 120deg)',
         }}

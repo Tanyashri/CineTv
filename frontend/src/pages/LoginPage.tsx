@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/auth.context';
 import { Mail, Lock, AlertCircle, Film } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { MOTION_TRANSITIONS, MOTION_VARIANTS } from '../config/motion';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -66,7 +67,13 @@ export function LoginPage() {
       `}</style>
 
       {/* ─── LEFT SIDE: CineTV Animated Branding / Visual Section ─── */}
-      <div className="relative w-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-[var(--background)] via-[var(--surface-elevated)] to-[var(--background)] border-b md:border-b-0 md:border-r border-[var(--border)] overflow-hidden select-none" style={{ minHeight: '360px' }}>
+      <motion.div
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: MOTION_TRANSITIONS.duration.slow, ease: MOTION_TRANSITIONS.easing }}
+        className="relative w-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-[var(--background)] via-[var(--surface-elevated)] to-[var(--background)] border-b md:border-b-0 md:border-r border-[var(--border)] overflow-hidden select-none"
+        style={{ minHeight: '360px' }}
+      >
         
         {/* ─── ANIMATION CONTAINER (z-index: 1) ─── */}
         <div className="absolute inset-0 z-1 overflow-hidden pointer-events-none">
@@ -248,14 +255,14 @@ export function LoginPage() {
             AI-powered movie discovery, personalized for you.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* ─── RIGHT SIDE: Auth Form ─── */}
       <div className="w-full flex items-center justify-center p-8 sm:p-12 md:p-16 bg-[var(--background)] overflow-y-auto scrollbar-thin">
         <motion.div
-          initial={{ opacity: 0, x: 15 }}
+          initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: MOTION_TRANSITIONS.duration.slow, ease: MOTION_TRANSITIONS.easing }}
           className="w-full max-w-[420px] flex flex-col"
         >
           {/* Welcome Text */}

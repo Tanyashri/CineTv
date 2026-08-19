@@ -9,6 +9,7 @@ import { Filter, ChevronDown } from 'lucide-react';
 import { useRecommendation } from '../contexts/recommendation.context';
 import { useAuth } from '../contexts/auth.context';
 import { LANGUAGE_OPTIONS, MODE_SELECT_OPTIONS } from './RecommendationsPage';
+import { MOTION_TRANSITIONS, MOTION_VARIANTS } from '../config/motion';
 
 const FALLBACK_MOVIE_POSTERS = [
   'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&auto=format&fit=crop&q=80',
@@ -273,43 +274,48 @@ export function HomePage() {
       </AnimatePresence>
 
       <motion.div
-        initial={isIntroActive ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
-        animate={!isIntroActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-        transition={{ duration: 1.0, ease: 'easeOut' }}
-        className="w-full max-w-[1200px] mx-auto px-6 py-6 flex flex-col items-center space-y-10"
+        initial={isIntroActive ? { opacity: 0, y: 12 } : { opacity: 1, y: 0 }}
+        animate={!isIntroActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+        transition={{ duration: MOTION_TRANSITIONS.duration.slow, ease: MOTION_TRANSITIONS.easing }}
+        className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-6 flex flex-col items-center space-y-10"
       >
         {/* ─── Hero & AI Prompt Bar Section ───────────────── */}
-        <div className="w-full flex flex-col items-center text-center select-none pt-12 pb-6">
-          <div className="flex flex-col items-center">
-            <h1 className="text-4xl sm:text-5xl md:text-[54px] font-bold tracking-tight text-[var(--text-primary)] leading-[1.1]">
+        <div className="w-full flex flex-col items-center text-center select-none pt-10 sm:pt-12 pb-5">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={!isIntroActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+            transition={{ delay: 0.15, duration: MOTION_TRANSITIONS.duration.slow, ease: MOTION_TRANSITIONS.easing }}
+            className="flex flex-col items-center"
+          >
+            <h1 className="text-4xl sm:text-5xl md:text-[54px] font-bold tracking-tight text-[var(--text-primary)] leading-[1.08]">
               Your Next Story Starts Here
             </h1>
-            <p className="mt-3 text-xs sm:text-sm md:text-base text-[var(--text-secondary)] font-medium max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 text-sm md:text-base text-[var(--text-secondary)] font-medium max-w-xl mx-auto leading-relaxed">
               Tell CineTV what you're in the mood for, and we'll find movies that fit.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="w-full max-w-[780px] mx-auto flex flex-col items-center animate-float mt-6">
+          <div className="w-full max-w-[780px] mx-auto flex flex-col items-center animate-float mt-7">
             <AIInputArea onSubmitPrompt={handleSubmitPrompt} isLoading={false} />
 
             {/* Centered Controls Toolbar: Mode ▼ & Language ▼ & Filters */}
-            <div className="flex flex-wrap items-center justify-center gap-3 w-full" style={{ marginTop: '14px' }}>
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 w-full pt-1" style={{ marginTop: '14px' }}>
               {/* Mode Selector Dropdown */}
               <div className="relative flex items-center justify-center" ref={modeDropdownRef}>
                 <BorderGlow
                   borderRadius={12}
                   glowColor="357 92 47"
-                  glowRadius={25}
-                  glowIntensity={1.2}
-                  edgeSensitivity={30}
+                  glowRadius={16}
+                  glowIntensity={0.55}
+                  edgeSensitivity={20}
                   backgroundColor="rgba(24, 24, 27, 0.6)"
                   colors={['#ef4444', '#b91c1c', '#f87171']}
-                  className="flex items-center justify-center"
+                  className="flex items-center justify-center rounded-lg"
                 >
                   <button
                     type="button"
                     onClick={() => setIsModeDropdownOpen(!isModeDropdownOpen)}
-                    className="flex items-center justify-center gap-2 px-4 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal py-2.5 bg-transparent border-0 rounded-none w-full"
+                    className="flex items-center justify-center gap-2 px-3.5 h-9 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal bg-transparent border-0 rounded-none w-full"
                   >
                     <span>Recommendation Mode: {selectedModeLabel}</span>
                     <ChevronDown className={`h-4 w-4 text-[var(--text-muted)] transition-transform duration-200 ${isModeDropdownOpen ? 'rotate-180' : ''}`} />
@@ -343,17 +349,17 @@ export function HomePage() {
                 <BorderGlow
                   borderRadius={12}
                   glowColor="357 92 47"
-                  glowRadius={25}
-                  glowIntensity={1.2}
-                  edgeSensitivity={30}
+                  glowRadius={16}
+                  glowIntensity={0.55}
+                  edgeSensitivity={20}
                   backgroundColor="rgba(24, 24, 27, 0.6)"
                   colors={['#ef4444', '#b91c1c', '#f87171']}
-                  className="flex items-center justify-center"
+                  className="flex items-center justify-center rounded-lg"
                 >
                   <button
                     type="button"
                     onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                    className="flex items-center justify-center gap-2 px-4 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal py-2.5 bg-transparent border-0 rounded-none w-full"
+                    className="flex items-center justify-center gap-2 px-3.5 h-9 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal bg-transparent border-0 rounded-none w-full"
                   >
                     <span>
                       Language:{' '}
@@ -404,17 +410,17 @@ export function HomePage() {
                 <BorderGlow
                   borderRadius={12}
                   glowColor="357 92 47"
-                  glowRadius={25}
-                  glowIntensity={1.2}
-                  edgeSensitivity={30}
+                  glowRadius={16}
+                  glowIntensity={0.55}
+                  edgeSensitivity={20}
                   backgroundColor="rgba(24, 24, 27, 0.6)"
                   colors={['#ef4444', '#b91c1c', '#f87171']}
-                  className="flex items-center justify-center"
+                  className="flex items-center justify-center rounded-lg"
                 >
                   <button
                     type="button"
                     onClick={() => setIsTriggerPanelOpen(true)}
-                    className="flex items-center justify-center gap-2 px-4 h-11 text-xs sm:text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal py-2.5 bg-transparent border-0 rounded-none w-full"
+                    className="flex items-center justify-center gap-2 px-3.5 h-9 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer leading-normal bg-transparent border-0 rounded-none w-full"
                   >
                     <Filter className="h-4 w-4 text-primary-500" />
                     <span>Filters</span>
@@ -434,13 +440,23 @@ export function HomePage() {
         {trending.length > 0 && (
           <div className="w-full space-y-4">
             <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Trending Movies</h2>
-            <div ref={trendingRowRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+            <motion.div
+              variants={MOTION_VARIANTS.staggerContainer}
+              initial="hidden"
+              animate="show"
+              ref={trendingRowRef}
+              className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
+            >
               {trending.slice(0, 10).map((movie) => (
-                <div key={movie.id} className="w-40 sm:w-44 shrink-0 snap-start">
+                <motion.div
+                  variants={MOTION_VARIANTS.staggerItem}
+                  key={movie.id}
+                  className="w-40 sm:w-44 shrink-0 snap-start"
+                >
                   <MovieCard movie={movie} />
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )}
 
@@ -448,13 +464,23 @@ export function HomePage() {
         {popular.length > 0 && (
           <div className="w-full space-y-4 pb-8">
             <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Popular Movies</h2>
-            <div ref={popularRowRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+            <motion.div
+              variants={MOTION_VARIANTS.staggerContainer}
+              initial="hidden"
+              animate="show"
+              ref={popularRowRef}
+              className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory"
+            >
               {popular.slice(0, 10).map((movie) => (
-                <div key={movie.id} className="w-40 sm:w-44 shrink-0 snap-start">
+                <motion.div
+                  variants={MOTION_VARIANTS.staggerItem}
+                  key={movie.id}
+                  className="w-40 sm:w-44 shrink-0 snap-start"
+                >
                   <MovieCard movie={movie} />
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )}
       </motion.div>

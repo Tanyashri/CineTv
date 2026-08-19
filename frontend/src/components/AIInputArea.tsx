@@ -106,7 +106,7 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
   };
 
   return (
-    <div className="w-full max-w-[850px] mx-auto flex flex-col items-center gap-6">
+    <div className="w-full max-w-[850px] mx-auto flex flex-col items-center gap-4 sm:gap-5">
       {/* Voice Error Alert Banner */}
       {voiceErrorMessage && (
         <div className="w-full flex items-center justify-between rounded-xl border border-red-500/30 bg-red-950/30 px-4 py-2.5 text-xs text-red-300 backdrop-blur-md mb-3">
@@ -134,7 +134,7 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
       )}
 
       {/* ─── Centered Transparent Glassmorphic AI Prompt Card ─── */}
-      <div className="prompt-glass-bubble relative w-full h-[135px] rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between border border-[var(--border)] mt-0">
+      <div className="prompt-glass-bubble relative w-full min-h-[124px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between border border-[var(--border)] mt-0">
         <textarea
           ref={textareaRef}
           value={prompt}
@@ -145,13 +145,13 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
               ? voiceInterim || '🔴 Listening... Speak your prompt into the microphone'
               : 'Tell me what you feel like watching...'
           }
-          className="w-full flex-1 resize-none bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none leading-relaxed"
-          style={{ padding: '16px 16px 10px 16px' }}
+          className="w-full flex-1 min-h-[72px] resize-none bg-transparent text-sm sm:text-[15px] text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none leading-6"
+          style={{ padding: '18px 20px 12px 20px' }}
         />
 
         {/* Live Speech Overlay */}
         {isRecording && (
-          <div className="absolute inset-x-0 bottom-[48px] flex items-center justify-between px-4 py-2 bg-[var(--surface-card)]/90 border-t border-b border-primary-500/40 z-10 backdrop-blur-md">
+          <div className="absolute inset-x-0 bottom-[52px] flex items-center justify-between px-5 py-2 bg-[var(--surface-card)]/90 border-t border-b border-primary-500/40 z-10 backdrop-blur-md">
             <div className="flex items-center gap-2 text-xs font-semibold text-primary-400">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
@@ -172,13 +172,13 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
         )}
 
         {/* Bottom Actions Row: Voice & Ask AI */}
-        <div className="flex items-center justify-between border-t border-[var(--border)] p-[6px_12px] h-[48px] shrink-0">
+        <div className="flex items-center justify-between border-t border-[var(--border)] px-3 py-2 h-[52px] shrink-0 bg-black/10">
           {/* Voice Button */}
           <button
             onClick={toggleVoice}
             type="button"
             title={isRecording ? 'Stop Listening' : 'Speak Prompt'}
-            className={`flex items-center gap-2 rounded-xl border border-[var(--border)] px-4 h-9 text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+            className={`flex items-center gap-2 rounded-lg border border-[var(--border)] px-3.5 h-8.5 text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
               isRecording
                 ? 'bg-primary-500 text-white shadow-md animate-pulse border-primary-400'
                 : 'bg-[var(--surface-card)]/65 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-primary-500/40'
@@ -193,7 +193,7 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
             onClick={handleSend}
             type="button"
             disabled={isLoading || (!prompt.trim() && !voiceInterim.trim())}
-            className="btn-primary px-6 h-9 text-xs font-bold shadow-lg shadow-primary-500/25 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+            className="btn-primary rounded-lg px-5 h-9 text-xs font-bold shadow-lg shadow-primary-500/25 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>{isLoading ? 'Finding recommendations...' : 'Ask AI'}</span>
             {!isLoading && <Send className="h-3.5 w-3.5 ml-1.5" />}
@@ -202,25 +202,25 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
       </div>
 
       {/* ─── Centered Transparent Glass Quick Prompt Chips ─── */}
-      <div className="flex flex-wrap items-center justify-center gap-3 w-full">
+      <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-[760px] px-1">
         {QUICK_PROMPTS.map((chip) => (
           <BorderGlow
             key={chip.label}
             borderRadius={12}
             glowColor="357 92 47"
-            glowRadius={25}
-            glowIntensity={1.2}
-            edgeSensitivity={30}
+            glowRadius={16}
+            glowIntensity={0.55}
+            edgeSensitivity={20}
             backgroundColor="rgba(24, 24, 27, 0.6)"
             colors={['#ef4444', '#b91c1c', '#f87171']}
-            className="flex items-center justify-center"
+            className="flex items-center justify-center rounded-lg"
           >
             <button
               onClick={() => {
                 setPrompt(chip.prompt);
                 onSubmitPrompt(chip.prompt);
               }}
-              className="px-4 h-11 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer flex items-center justify-center py-2.5 leading-normal bg-transparent border-0 rounded-none w-full"
+              className="px-3 h-8.5 text-[11px] sm:text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] outline-none cursor-pointer flex items-center justify-center whitespace-nowrap leading-normal bg-transparent border-0 rounded-none w-full"
             >
               {chip.label}
             </button>

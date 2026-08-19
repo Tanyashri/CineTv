@@ -60,7 +60,7 @@ export const AIChatSection: React.FC<AIChatSectionProps> = ({ onRegenerateFromCa
                   </div>
                 )}
 
-                <div className={`max-w-2xl space-y-3 ${isUser ? 'items-end text-right' : 'items-start text-left'}`}>
+                <div className={`w-full space-y-3 ${isUser ? 'items-end text-right' : 'items-start text-left'} ${msg.candidates && msg.candidates.length > 0 ? 'max-w-6xl' : 'max-w-2xl'}`}>
                   {/* Timestamp */}
                   <div className="flex items-center gap-2 text-[11px] text-slate-400">
                     <span className="font-semibold text-slate-300">{isUser ? 'You' : 'CineVerse AI'}</span>
@@ -103,7 +103,7 @@ export const AIChatSection: React.FC<AIChatSectionProps> = ({ onRegenerateFromCa
                         <span>Recommended Candidates ({msg.candidates.length}):</span>
                       </div>
 
-                      <div className="grid gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
                         {msg.candidates.map((candidate, idx) => (
                           <RichRecommendationCard
                             key={`${msg.id}-cand-${candidate.movie.id || idx}`}

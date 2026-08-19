@@ -30,6 +30,7 @@ export interface PromptAnalysisResult {
   intent: string;
   genreIds: number[];
   language?: string | null;
+  languages?: string[] | null;
   maxRuntime?: number | null;
   releaseDecade?: string | null;
   negativePreferences: string[];
@@ -178,6 +179,9 @@ export class RecommendationOrchestrator {
       if (options.languages && options.languages.length > 0 && !options.languages.includes('auto')) {
         // Explicit selection (User Override)
         targetLanguages = [...options.languages];
+      } else if (analysis.languages && analysis.languages.length > 0) {
+        // Prompt language requirement (multiple languages)
+        targetLanguages = [...analysis.languages];
       } else if (analysis.language) {
         // Prompt language requirement (e.g. "I want a Kannada movie")
         targetLanguages = [analysis.language];
@@ -437,7 +441,7 @@ export class RecommendationOrchestrator {
   "predictedOutcome": "Short summary of expected emotional benefit (e.g. Uplifted & Comforted)",
   "intent": "Core cinematic intent (e.g. Comforting Feel-Good Comedy)",
   "genreNames": ["Comedy", "Romance"],
-  "language": "en | hi | kn | ta | te | ml | bn | mr | gu | pa | ko | ja | es | fr | de | it | zh | ar | null",
+  "languages": ["en", "hi", "kn", "ta", "te", "ml", "bn", "mr", "gu", "pa", "ko", "ja", "es", "fr", "de", "it", "zh", "ar"],
   "maxRuntime": 120 | null,
   "negativePreferences": ["romance", "gore", "violence"],
   "searchKeywords": ["comforting", "heartwarming"],
@@ -465,12 +469,25 @@ export class RecommendationOrchestrator {
             }
           }
 
+          let languagesParsed: string[] = [];
+          if (Array.isArray(parsed.languages)) {
+            languagesParsed = parsed.languages
+              .map((l: any) => String(l).toLowerCase().trim())
+              .filter((l: string) => Object.values(LANGUAGE_MAP).includes(l));
+          } else if (parsed.language) {
+            const singleLang = String(parsed.language).toLowerCase().trim();
+            if (Object.values(LANGUAGE_MAP).includes(singleLang)) {
+              languagesParsed = [singleLang];
+            }
+          }
+
           return {
             detectedEmotion: parsed.detectedEmotion || 'Neutral',
             emotionalIntensity: parsed.emotionalIntensity || 'medium',
             predictedOutcome: parsed.predictedOutcome || 'Engaged & Entertained',
             intent: parsed.intent || 'Film Recommendation',
             genreIds,
+            languages: languagesParsed.length > 0 ? languagesParsed : null,
             language: parsed.language || null,
             maxRuntime: typeof parsed.maxRuntime === 'number' ? parsed.maxRuntime : null,
             releaseDecade: parsed.releaseDecade || null,
@@ -512,12 +529,13 @@ export class RecommendationOrchestrator {
     }
 
     // Explicit language extraction
+    const languages: string[] = [];
     for (const [langName, langCode] of Object.entries(LANGUAGE_MAP)) {
-      if (lower.includes(langName)) {
-        language = langCode;
-        break;
+      if (lower.includes(langName) && !languages.includes(langCode)) {
+        languages.push(langCode);
       }
     }
+    language = languages.length > 0 ? languages[0] : null;
 
     // Explicit runtime extraction
     const runtimeMatch = lower.match(/(under|less than|max)\s*(\d+)\s*(min|minute|hour|hrs)/);
@@ -606,6 +624,7 @@ export class RecommendationOrchestrator {
       intent,
       genreIds,
       language,
+      languages: languages.length > 0 ? languages : null,
       maxRuntime,
       negativePreferences,
       searchKeywords: [],

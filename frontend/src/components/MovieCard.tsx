@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { tmdbService, type TmdbMovieItem } from '../services/tmdb.service';
 import { useRecommendation } from '../contexts/recommendation.context';
 import { SpookyTrail } from './ui';
+import { MOTION_TRANSITIONS } from '../config/motion';
 
 export interface MovieCardProps {
   movie: TmdbMovieItem;
@@ -45,10 +46,10 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie, onSelectPrompt }) =
 
   return (
     <motion.div
-      whileHover={{ y: -4, scale: 1.01 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+      whileHover={{ y: -6, scale: 1.025 }}
+      transition={MOTION_TRANSITIONS.springSmooth}
       onClick={handleCardClick}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-card)]/50 p-2 transition-all duration-300 hover:border-primary-500/40 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(229,9,20,0.15)] shadow-sm w-full"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-card)]/50 p-2 transition-all duration-300 hover:border-primary-500/40 hover:shadow-[0_12px_35px_rgba(229,9,20,0.18)] shadow-sm w-full"
     >
       {/* Spooky Ghost Cursor Trail (Spawns red particles for horror genre movies) */}
       <SpookyTrail active={isHorror} />
@@ -59,7 +60,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie, onSelectPrompt }) =
           src={posterUrl}
           alt={movie.title}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-103"
+          className="h-full w-full object-cover transition-transform duration-[0.65s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
         />
 
         {/* Hover Action Center Buttons */}

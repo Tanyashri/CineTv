@@ -27,6 +27,7 @@ import { TriggerFilterPanel } from '../components/TriggerFilterPanel';
 import { IntroSplash } from '../components/IntroSplash';
 import { CinematicBackground } from '../components/CinematicBackground';
 import { Dock } from '../components/ui';
+import { MOTION_TRANSITIONS, MOTION_VARIANTS } from '../config/motion';
 
 const navLinks = [
   { to: '/', label: 'Home', icon: Film },
@@ -366,7 +367,7 @@ export function RootLayout() {
       <main 
         className={`flex-1 w-full flex flex-col ${isAuthPage ? 'items-stretch md:overflow-hidden overflow-y-auto' : 'items-center pb-24'}`} 
         style={{ 
-          paddingTop: isAuthPage ? '80px' : '110px', 
+          paddingTop: isAuthPage ? '80px' : location.pathname.startsWith('/movie/') ? '76px' : '110px',
           height: isAuthPage ? (isMobile ? 'auto' : '100vh') : 'auto',
           minHeight: isAuthPage ? (isMobile ? 'calc(100vh - 80px)' : '100vh') : 'auto'
         }}
@@ -389,7 +390,7 @@ export function RootLayout() {
       )}
 
       {/* Floating Interactive Dock Navigation */}
-      {!['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].includes(location.pathname) && (
+      {!['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/profile'].includes(location.pathname) && (
         <Dock
           items={dockItems}
           panelHeight={isMobile ? 52 : 68}

@@ -10,6 +10,7 @@ import { MovieGridSkeleton } from '../components/ui/Skeleton';
 import { ErrorState } from '../components/ui/ErrorState';
 import { motion } from 'framer-motion';
 import { SplitText } from '../components/ui/SplitText';
+import { MOTION_TRANSITIONS, MOTION_VARIANTS } from '../config/motion';
 
 export const LANGUAGE_OPTIONS = [
   { id: 'en', label: 'English' },
@@ -449,15 +450,24 @@ export function RecommendationsPage() {
                 </button>
               </div>
 
-              {/* 3-Column Desktop / 2-Column Tablet / 1-Column Mobile Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* 4-Column Desktop / 2-Column Tablet / 1-Column Mobile Grid */}
+              <motion.div
+                variants={MOTION_VARIANTS.staggerContainer}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              >
                 {validCandidates.map((candidate) => (
-                  <RichRecommendationCard
+                  <motion.div
+                    variants={MOTION_VARIANTS.staggerItem}
                     key={candidate.movie.id}
-                    candidate={candidate}
-                  />
+                  >
+                    <RichRecommendationCard
+                      candidate={candidate}
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           )}
         </div>

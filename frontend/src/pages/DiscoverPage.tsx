@@ -7,6 +7,8 @@ import { ErrorState } from '../components/ui/ErrorState';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AccordionGallery } from '../components/ui/AccordionGallery';
 import { useRecommendation } from '../contexts/recommendation.context';
+import { motion } from 'framer-motion';
+import { MOTION_TRANSITIONS, MOTION_VARIANTS } from '../config/motion';
 
 const AVAILABLE_LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -194,15 +196,24 @@ export function DiscoverPage() {
               }}
             />
           ) : (
-            <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 w-full">
+            <motion.div
+              variants={MOTION_VARIANTS.staggerContainer}
+              initial="hidden"
+              animate="show"
+              className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 w-full"
+            >
               {filteredMovies.map((movie) => (
-                <MovieCard
+                <motion.div
+                  variants={MOTION_VARIANTS.staggerItem}
                   key={movie.id}
-                  movie={movie}
-                  onSelectPrompt={handleSelectPrompt}
-                />
+                >
+                  <MovieCard
+                    movie={movie}
+                    onSelectPrompt={handleSelectPrompt}
+                  />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       )}
