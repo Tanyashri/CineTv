@@ -19,6 +19,16 @@ export class FrontendAuthService {
     const session = response.data.data;
     if (session.accessToken) {
       localStorage.setItem('access_token', session.accessToken);
+      if (session.refreshToken) {
+        try {
+          await supabase.auth.setSession({
+            access_token: session.accessToken,
+            refresh_token: session.refreshToken,
+          });
+        } catch {
+          // Ignore setSession fallback errors
+        }
+      }
     }
     return session;
   }
@@ -31,6 +41,16 @@ export class FrontendAuthService {
     const session = response.data.data;
     if (session.accessToken) {
       localStorage.setItem('access_token', session.accessToken);
+      if (session.refreshToken) {
+        try {
+          await supabase.auth.setSession({
+            access_token: session.accessToken,
+            refresh_token: session.refreshToken,
+          });
+        } catch {
+          // Ignore setSession fallback errors
+        }
+      }
     }
     return session;
   }
