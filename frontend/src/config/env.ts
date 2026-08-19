@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const frontendEnvSchema = z.object({
-  VITE_API_BASE_URL: z.string().min(1, 'VITE_API_BASE_URL is required').default('http://localhost:4000/api/v1'),
+  VITE_API_BASE_URL: z.string().min(1, 'VITE_API_BASE_URL is required').default('https://cinetv-v429.onrender.com/api/v1'),
   VITE_SUPABASE_URL: z.string().url('VITE_SUPABASE_URL must be a valid URL').default('https://placeholder.supabase.co'),
   VITE_SUPABASE_ANON_KEY: z.string().min(1, 'VITE_SUPABASE_ANON_KEY is required').default('placeholder-anon-key'),
 });
@@ -10,7 +10,7 @@ export type FrontendEnv = z.infer<typeof frontendEnvSchema>;
 
 function loadFrontendEnv(): FrontendEnv {
   const envData = {
-    VITE_API_BASE_URL: import.meta.env['VITE_API_BASE_URL'] || 'http://localhost:4000/api/v1',
+    VITE_API_BASE_URL: import.meta.env['VITE_API_BASE_URL'] || 'https://cinetv-v429.onrender.com/api/v1',
     VITE_SUPABASE_URL: import.meta.env['VITE_SUPABASE_URL'] || 'https://placeholder.supabase.co',
     VITE_SUPABASE_ANON_KEY: import.meta.env['VITE_SUPABASE_ANON_KEY'] || 'placeholder-anon-key',
   };
