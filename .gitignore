@@ -50,3 +50,6 @@ pgadmin-data/
 # Misc
 *.tgz
 .cache/
+
+.vercel
+.env*

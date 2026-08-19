@@ -3,13 +3,18 @@ import { recommendationOrchestrator } from './recommendation.orchestrator.js';
 import { HttpStatus } from '../../constants/http-status.js';
 import { prisma } from '../../database/prisma.js';
 
+import { validatePrompt } from '../../utils/prompt-validator.js';
+
 export class RecommendationController {
   async prepare(req: Request, res: Response): Promise<void> {
     const prompt = (req.body['prompt'] as string) || '';
-    if (!prompt) {
+    const validation = validatePrompt(prompt);
+
+    if (!validation.isValid) {
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
-        message: 'Prompt string is required.',
+        message: validation.errorMessage || 'Invalid prompt entered. Please enter a valid movie requirement, mood, or title.',
+        code: 'INVALID_PROMPT',
       });
       return;
     }

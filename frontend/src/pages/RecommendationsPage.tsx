@@ -4,6 +4,7 @@ import { Sparkles, Filter, ChevronDown, RefreshCw, Film } from 'lucide-react';
 import { useRecommendation } from '../contexts/recommendation.context';
 import { frontendRecommendationService, type RecommendationCandidate } from '../services/recommendation.service';
 import { validateAndFilterRecommendations } from '../utils/recommendation-validator';
+import { validatePrompt } from '../utils/prompt-validator';
 import { RichRecommendationCard } from '../components/RichRecommendationCard';
 import { AIInputArea } from '../components/AIInputArea';
 import { MovieGridSkeleton } from '../components/ui/Skeleton';
@@ -189,6 +190,13 @@ export function RecommendationsPage() {
 
   const handleExecuteRecommendation = async (userQuery: string, modeOverride?: string) => {
     if (!userQuery.trim() || isLoading) return;
+
+    const validation = validatePrompt(userQuery);
+    if (!validation.isValid) {
+      setError(validation.errorMessage || 'Please enter a valid movie prompt or mood description.');
+      setCandidates([]);
+      return;
+    }
 
     setPrompt(userQuery);
     setIsLoading(true);

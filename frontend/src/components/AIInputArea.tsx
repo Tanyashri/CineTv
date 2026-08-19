@@ -33,11 +33,14 @@ const QUICK_PROMPTS = [
   { label: 'Comedy', prompt: 'I want a hilarious comedy movie to cheer me up.' },
 ];
 
+import { validatePrompt } from '../utils/prompt-validator';
+
 export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoading = false }) => {
   const [prompt, setPrompt] = useState('');
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [voiceInterim, setVoiceInterim] = useState('');
   const [voiceErrorMessage, setVoiceErrorMessage] = useState<string | null>(null);
+  const [promptValidationError, setPromptValidationError] = useState<string | null>(null);
 
   const isRecording = voiceState === 'listening';
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -51,6 +54,14 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
   const handleSend = () => {
     const finalQuery = prompt.trim() || voiceInterim.trim();
     if (!finalQuery || isLoading) return;
+
+    const validation = validatePrompt(finalQuery);
+    if (!validation.isValid) {
+      setPromptValidationError(validation.errorMessage || 'Please enter a valid movie requirement.');
+      return;
+    }
+
+    setPromptValidationError(null);
 
     if (isRecording) {
       frontendVoiceService.stopListening();
@@ -107,9 +118,25 @@ export const AIInputArea: React.FC<AIInputAreaProps> = ({ onSubmitPrompt, isLoad
 
   return (
     <div className="w-full max-w-[850px] mx-auto flex flex-col items-center gap-4 sm:gap-5">
+      {/* Prompt Validation Error Banner */}
+      {promptValidationError && (
+        <div className="w-full flex items-center justify-between rounded-xl border border-red-500/40 bg-red-950/50 px-4 py-3 text-xs sm:text-sm text-red-200 backdrop-blur-md mb-2 shadow-lg">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="h-4.5 w-4.5 text-red-400 shrink-0" />
+            <span className="font-medium">{promptValidationError}</span>
+          </div>
+          <button
+            onClick={() => setPromptValidationError(null)}
+            className="text-red-400 hover:text-white p-1 cursor-pointer shrink-0 ml-2"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* Voice Error Alert Banner */}
       {voiceErrorMessage && (
-        <div className="w-full flex items-center justify-between rounded-xl border border-red-500/30 bg-red-950/30 px-4 py-2.5 text-xs text-red-300 backdrop-blur-md mb-3">
+        <div className="w-full flex items-center justify-between rounded-xl border border-red-500/30 bg-red-950/30 px-4 py-2.5 text-xs text-red-300 backdrop-blur-md mb-2">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
             <span>{voiceErrorMessage}</span>
