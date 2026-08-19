@@ -157,6 +157,9 @@ export function HomePage() {
     setIsIntroActive(false);
     // Clear URL query parameters
     window.history.replaceState({}, document.title, window.location.pathname);
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
   };
 
   // Load category feeds & TMDb intro posters on mount

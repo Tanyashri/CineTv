@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { RootLayout } from '@/layouts/RootLayout';
 import { HomePage } from '@/pages/HomePage';
 import { LoginPage } from '@/pages/LoginPage';
@@ -37,20 +37,29 @@ function AnonymousOnlyRoute({ children }: { children: React.ReactNode }) {
   return children;
 }
 
+// Route Guard for "/": Allows HomePage to render if user hasn't seen the Dome intro yet, otherwise requires authentication
+function HomeRouteGuard() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) return <PageFallback />;
+
+  const hasSeenIntro = Boolean(localStorage.getItem('cinetv_intro_seen'));
+
+  if (!isAuthenticated && hasSeenIntro) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <HomePage />;
+}
+
 export default function App() {
   return (
     <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route element={<RootLayout />}>
-          {/* Protected Application Routes (Sign In Required) */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Main Root Route: Plays Dome Intro on first visit, then mandates Sign In */}
+          <Route path="/" element={<HomeRouteGuard />} />
           <Route
             path="/discover"
             element={
