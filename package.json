@@ -28,7 +28,7 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production') { try { require('child_process').execSync('husky'); } catch (e) {} }\""
+    "prepare": "node -e \"if (!process.env.CI && !process.env.VERCEL && process.env.NODE_ENV !== 'production') { try { require('child_process').execSync('npx husky'); } catch (e) {} }\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.0.0",
