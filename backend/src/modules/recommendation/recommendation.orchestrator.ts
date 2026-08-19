@@ -535,7 +535,7 @@ export class RecommendationOrchestrator {
         languages.push(langCode);
       }
     }
-    language = languages.length > 0 ? languages[0] : null;
+    language = languages[0] ?? null;
 
     // Explicit runtime extraction
     const runtimeMatch = lower.match(/(under|less than|max)\s*(\d+)\s*(min|minute|hour|hrs)/);

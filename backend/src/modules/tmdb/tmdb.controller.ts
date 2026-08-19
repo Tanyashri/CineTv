@@ -66,7 +66,7 @@ export class TmdbController {
       langGroups[lang] = [];
     }
     for (const item of listResults) {
-      langGroups[item.lang].push(...item.results);
+      langGroups[item.lang]?.push(...item.results);
     }
 
     // Combine using Round-Robin merging

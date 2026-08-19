@@ -4,7 +4,7 @@ import axios from 'axios';
 
 dotenv.config();
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_API_KEY = process.env['TMDB_API_KEY'];
 
 if (!TMDB_API_KEY) {
   console.error("TMDB_API_KEY is not defined in backend/.env!");
@@ -81,8 +81,8 @@ async function runTest() {
       const videos: TmdbVideoItem[] = res.data.results || [];
       const candidates = getSortedTrailerKeys(videos);
 
-      if (candidates.length > 0) {
-        const top = candidates[0];
+      const top = candidates[0];
+      if (top) {
         console.log(`| ${movie.title} | ${movie.id} | ${candidates.length} | ${top.key} | ${top.type} | ${top.official} | https://www.youtube.com/embed/${top.key} |`);
       } else {
         console.log(`| ${movie.title} | ${movie.id} | 0 | None | N/A | N/A | UNAVAILABLE |`);
