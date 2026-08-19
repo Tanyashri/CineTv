@@ -44,9 +44,57 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       const currentUser = await frontendAuthService.getCurrentUser();
-      setUser(currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+        return;
+      }
+
+      // Fallback: load user details from Supabase active session if backend sync is pending
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const isGoogle = session.user.app_metadata?.['provider'] === 'google';
+        const fullName = (session.user.user_metadata?.['full_name'] as string) || (session.user.user_metadata?.['name'] as string) || null;
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName,
+          name: fullName,
+          avatarUrl: (session.user.user_metadata?.['avatar_url'] as string) || (session.user.user_metadata?.['picture'] as string) || null,
+          emailVerified: Boolean(session.user.email_confirmed_at),
+          authProvider: isGoogle ? 'GOOGLE' : 'EMAIL',
+          provider: isGoogle ? 'GOOGLE' : 'EMAIL',
+          role: 'USER',
+          createdAt: session.user.created_at,
+          updatedAt: session.user.created_at,
+        });
+      } else {
+        setUser(null);
+      }
     } catch {
-      setUser(null);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const isGoogle = session.user.app_metadata?.['provider'] === 'google';
+          const fullName = (session.user.user_metadata?.['full_name'] as string) || (session.user.user_metadata?.['name'] as string) || null;
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            fullName,
+            name: fullName,
+            avatarUrl: (session.user.user_metadata?.['avatar_url'] as string) || (session.user.user_metadata?.['picture'] as string) || null,
+            emailVerified: Boolean(session.user.email_confirmed_at),
+            authProvider: isGoogle ? 'GOOGLE' : 'EMAIL',
+            provider: isGoogle ? 'GOOGLE' : 'EMAIL',
+            role: 'USER',
+            createdAt: session.user.created_at,
+            updatedAt: session.user.created_at,
+          });
+        } else {
+          setUser(null);
+        }
+      } catch {
+        setUser(null);
+      }
     } finally {
       setIsLoading(false);
     }
