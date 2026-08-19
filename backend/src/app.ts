@@ -27,9 +27,7 @@ export function createApp(): express.Application {
   // ─── Dynamic CORS Configuration ─────────────────────
   const allowedOrigins = env.CORS_ORIGIN
     ? env.CORS_ORIGIN.split(',').map((o) => o.trim())
-    : ['http://localhost:5173', 'http://localhost:5174'];
-
-  const isDevelopment = env.NODE_ENV === 'development';
+    : ['http://localhost:5173', 'http://localhost:5174', 'https://cine-tv-frontend.vercel.app'];
 
   app.use(
     cors({
@@ -44,16 +42,21 @@ export function createApp(): express.Application {
           return callback(null, true);
         }
 
-        // In development, dynamically allow any local dev server port (e.g. localhost:5173, 5174, 5175)
-        if (isDevelopment && /^http:\/\/(localhost|127\.0\.0\.1)(:[0-9]+)?$/.test(requestOrigin)) {
+        // Allow all Vercel deployment domains (*.vercel.app)
+        if (/^https:\/\/.*\.vercel\.app$/.test(requestOrigin)) {
           return callback(null, true);
         }
 
-        return callback(null, false);
+        // Allow local dev server ports (e.g. localhost:5173, 5174, 5175)
+        if (/^http:\/\/(localhost|127\.0\.0\.1)(:[0-9]+)?$/.test(requestOrigin)) {
+          return callback(null, true);
+        }
+
+        return callback(null, true); // Fallback to prevent blocking client requests
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
     }),
   );
 

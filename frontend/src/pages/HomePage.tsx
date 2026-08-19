@@ -138,8 +138,12 @@ export function HomePage() {
     });
   };
 
-  // Temporarily set to true on mount for debugging (ignores localStorage until confirmed working)
-  const [isIntroActive, setIsIntroActive] = useState<boolean>(true);
+  // Play intro sequence once per session or when ?intro=true is passed
+  const [isIntroActive, setIsIntroActive] = useState<boolean>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('intro') === 'true') return true;
+    return !localStorage.getItem('cinetv_intro_seen');
+  });
 
   const [introImages, setIntroImages] = useState<Array<{ src: string; alt: string }>>(() => {
     return FALLBACK_MOVIE_POSTERS.map((src, idx) => ({
@@ -151,11 +155,8 @@ export function HomePage() {
   const handleEnterApp = () => {
     localStorage.setItem('cinetv_intro_seen', 'true');
     setIsIntroActive(false);
-    // Clear URL query parameters to prevent replaying on page reload
-    window.history.replaceState({}, document.title, '/');
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
+    // Clear URL query parameters
+    window.history.replaceState({}, document.title, window.location.pathname);
   };
 
   // Load category feeds & TMDb intro posters on mount
