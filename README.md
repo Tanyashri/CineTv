@@ -1,182 +1,307 @@
-# CineVerse AI
+🎬 CineTV --- AI-Powered Movie Discovery & Recommendation Platform
 
-> 🎬 Full-stack SaaS movie recommendation platform powered by AI.
+CineTV is a modern AI-powered movie discovery platform that helps users
+find movies based on what they want to watch, how they feel, and their
+preferences.
 
-## Architecture
+✨ Live Demo
 
-```
-cineverse-ai/
-├── backend/          # Express.js + TypeScript API
-│   ├── .env          # Backend-specific environment variables (DATABASE_URL, SUPABASE_SERVICE_ROLE_KEY, etc.)
-│   ├── .env.example  # Backend environment template
-│   ├── prisma/       # Database schema & migrations
-│   └── src/
-│       ├── auth/     # Authentication service, controllers, routes & middleware
-│       ├── cache/    # Stage 2 PostgreSQL cache (MovieEnrichmentCache)
-│       ├── config/   # Environment (Zod fail-fast), Supabase & Swagger config
-│       ├── constants/# HTTP status, roles, messages
-│       ├── controllers/
-│       ├── database/ # Prisma client (Supabase PostgreSQL)
-│       ├── middleware/# Error handler, validation, rate limiting, request tracker
-│       ├── pipeline/ # AI pipeline placeholder
-│       ├── routes/
-│       ├── schemas/  # Zod validation schemas (Auth & Common)
-│       ├── services/
-│       ├── types/
-│       └── utils/    # Logger, SSE, errors
-├── frontend/         # React 19 + Vite + Tailwind v4
-│   ├── .env          # Public frontend environment variables (VITE_* only)
-│   ├── .env.example  # Frontend environment template
-│   └── src/
-│       ├── components/# UI components & ProtectedRoute guard
-│       ├── config/    # Frontend environment Zod validation
-│       ├── contexts/  # AuthContext & AuthProvider
-│       ├── hooks/
-│       ├── layouts/
-│       ├── pages/     # Login, Register, Forgot/Reset Password, Verify Email, Profile, Home, Health
-│       ├── services/  # API Client, Supabase Client & FrontendAuthService
-│       └── types/
-├── docker-compose.yml
-└── .github/workflows/ci.yml
-```
+https://cine-tv-frontend.vercel.app/
 
----
+📦 Source Code
 
-## Environment Variable Architecture
+https://github.com/Tanyashri/CineTv
 
-To maintain strict security isolation, environment variables are clean, standardized, and strictly compartmentalized:
+🚀 Features
 
-### 1. Root Directory (`.env`)
-- **Status**: **Removed / Not Required**.
-- The root directory contains no running runtime processes. All credentials live strictly within their respective workspace environment files.
+🤖 AI Movie Recommendations --- Describe a mood, story, genre,
+language, or viewing situation in natural language.
 
----
+🧠 Emotion-Aware Recommendations --- Understands emotional
+context and desired viewing mood.
 
-### 2. Backend Environment (`backend/.env` & `backend/.env.example`)
-Contains ALL server-side credentials, database URLs, Supabase admin keys, JWT secrets, and external API keys.
+🌍 Multilingual Discovery --- Supports movie discovery across
+multiple languages rather than English-only recommendations.
 
-```env
-# Server
-NODE_ENV=development
-PORT=4000
+🎭 Genre & Preference Filtering --- Combine genres, languages,
+moods, themes, runtime and other preferences.
 
-# Database (Supabase PostgreSQL)
-DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true
-DIRECT_URL=postgresql://postgres.[project-ref]:[password]@db.[project-ref].supabase.co:5432/postgres
+🎙️ Voice Input --- Describe what you want to watch using voice
+input.
 
-# Supabase Admin API Credentials
-SUPABASE_URL=https://<your-project-ref>.supabase.co
-SUPABASE_ANON_KEY=your-supabase-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
-# Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-GOOGLE_CALLBACK_URL=http://localhost:4000/api/v1/auth/google/callback
+🎞️ Movie Trailers --- Retrieves movie videos through TMDb and
+prioritizes official YouTube trailers/teasers.
 
-# External APIs
-TMDB_API_KEY=your-tmdb-api-key
-GEMINI_API_KEY=your-gemini-api-key
-WIKIPEDIA_API_BASE=https://en.wikipedia.org/w/api.php
+📺 Where to Watch --- Displays available streaming providers
+when reliable provider data is available.
 
-# CORS & Logging
-CORS_ORIGIN=http://localhost:5173
-LOG_LEVEL=debug
-```
+🔍 Movie Discovery --- Explore trending, popular, top-rated,
+upcoming, hidden-gem and international movies.
 
-> ⚠️ The backend process enforces **fail-fast Zod validation** via `backend/src/config/env.ts`. Startup aborts immediately if any required variable is missing or malformed.
+👤 User Profiles --- Manage profile information, favorites,
+watched movies, recommendation history and preferences.
 
----
+🌓 Dynamic Themes --- Responsive Dark/Light theme with adaptive
+text, surfaces and accents.
 
-### 3. Frontend Environment (`frontend/.env` & `frontend/.env.example`)
-Contains ONLY public browser-safe variables starting with `VITE_`. No secrets (`DATABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_ACCESS_SECRET`, `GOOGLE_CLIENT_SECRET`, etc.) are exposed.
+✨ Modern Cinematic UI --- Responsive movie cards, animated
+interactions and a cinema-focused interface.
 
-```env
-# Public Frontend Variables Only
-VITE_API_BASE_URL=http://localhost:4000/api/v1
-VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-```
+🧠 Recommendation Flow
 
-> ⚠️ The frontend client validates `VITE_*` variables on initialization via `frontend/src/config/env.ts`.
+User Prompt
+     ↓
+Natural Language Understanding
+     ↓
+Emotion + Intent Detection
+     ↓
+Preference & Constraint Extraction
+     ↓
+Language / Genre / Theme Filtering
+     ↓
+TMDb Candidate Retrieval
+     ↓
+Recommendation Scoring & Ranking
+     ↓
+Recommendation Explanation
+     ↓
+Personalized Movie Cards
 
----
+CineTV is designed to move beyond simple movie search:
 
-## Authentication API Endpoints
+Describe → Understand → Personalize → Recommend
 
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST` | `/api/v1/auth/register` | Public | Register new user with email, password, and optional full name |
-| `POST` | `/api/v1/auth/login` | Public | Authenticate user & return Supabase access session |
-| `POST` | `/api/v1/auth/logout` | Protected | Invalidate session & logout user |
-| `POST` | `/api/v1/auth/forgot-password` | Public | Send password reset link to user email |
-| `POST` | `/api/v1/auth/reset-password` | Public/Protected | Reset password using recovery token |
-| `GET`  | `/api/v1/auth/me` | Protected | Get authenticated user profile from Prisma database |
-| `PUT`  | `/api/v1/auth/profile` | Protected | Update user profile (`fullName`, `avatarUrl`) |
-| `GET`  | `/api/v1/auth/google` | Public | Get Google OAuth redirect URL |
+🏗️ Architecture
 
----
+┌─────────────────────────────────────────────┐
+│              CineTV Frontend                │
+│                                             │
+│ React • TypeScript • Vite • Tailwind CSS    │
+│                                             │
+│ Home • Discover • Recommendations           │
+│ Movie Details • Profile • Authentication    │
+└──────────────────────┬──────────────────────┘
+                       │ REST API
+                       ▼
+┌─────────────────────────────────────────────┐
+│               CineTV Backend                │
+│                                             │
+│ Node.js • TypeScript • REST APIs • Docker   │
+│                                             │
+│ Recommendation Engine                       │
+│ TMDb Integration                            │
+│ Trailer Retrieval                           │
+│ Watch Provider Retrieval                     │
+│ AI / Emotion Processing                      │
+└──────────────┬──────────────┬───────────────┘
+               │              │
+               ▼              ▼
+             TMDb          Supabase
+               │
+               ▼
+              AI
 
-## Local Development Guide
+🛠️ Technology Stack
 
-### Prerequisites
+Frontend
 
-- **Node.js**: `≥ 20.0.0`
-- **npm**: `≥ 10.0.0`
-- **Supabase Account**: [https://supabase.com](https://supabase.com)
+React
 
----
+TypeScript
 
-### Step-by-Step Setup
+Vite
 
-```bash
-# Clone the repository
-git clone <repo-url>
-cd cineverse-ai
+Tailwind CSS
 
-# Install workspace dependencies
+Responsive UI components
+
+Modern CSS animations
+
+Backend
+
+Node.js
+
+TypeScript
+
+REST APIs
+
+Docker
+
+AI & Recommendation
+
+Natural-language prompt analysis
+
+Emotion and intent extraction
+
+Preference-aware recommendation
+
+Recommendation scoring and ranking
+
+AI-generated recommendation explanations
+
+Services
+
+TMDb --- Movie metadata, posters, genres and videos
+
+YouTube --- Trailer playback
+
+Supabase --- Authentication and user data
+
+Vercel --- Frontend deployment
+
+Render --- Backend deployment
+
+🎞️ Trailer Flow
+
+CineTV does not randomly search YouTube by movie title.
+
+Movie TMDb ID
+     ↓
+TMDb Videos Endpoint
+     ↓
+Trailer Selection
+     ↓
+Verified YouTube Video Key
+     ↓
+YouTube Player / Modal
+
+Official trailers are preferred, followed by official teasers when
+appropriate. If a valid trailer is unavailable, the UI handles the
+unavailable state instead of displaying a broken player.
+
+👤 User Features
+
+Authenticated users can manage:
+
+Profile
+
+Favorites
+
+Watched movies
+
+Recommendation history
+
+Preferences
+
+Account information
+
+🔐 Security
+
+Sensitive credentials should remain on the backend/server environment.
+
+Do not expose or commit:
+
+TMDb API keys
+
+AI API keys
+
+Database credentials
+
+Authentication secrets
+
+Other private environment variables
+
+💻 Local Development
+
+Clone
+
+git clone https://github.com/Tanyashri/CineTv.git
+cd CineTv
+
+Frontend
+
+cd frontend
 npm install
-
-# Setup backend environment file
-cp backend/.env.example backend/.env
-# Fill in your database and Supabase credentials in backend/.env
-
-# Setup frontend environment file
-cp frontend/.env.example frontend/.env
-# Fill in public VITE_ variables in frontend/.env
-
-# Apply Prisma schema to PostgreSQL database
-npm run db:push --workspace=backend
-
-# Generate Prisma Client
-npm run db:generate --workspace=backend
-
-# Run type check & unit tests
-npm run typecheck
-npm run test:backend
-
-# Start backend & frontend concurrently
 npm run dev
-```
 
----
+Backend
 
-## Workspace Scripts
+cd ../backend
+npm install
+npm run dev
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start both frontend and backend concurrently |
-| `npm run dev:backend` | Start backend dev server (`http://localhost:4000`) |
-| `npm run dev:frontend` | Start frontend dev server (`http://localhost:5173`) |
-| `npm run build` | Build all workspace packages |
-| `npm run typecheck` | Run TypeScript type checks across all workspaces |
-| `npm run test` | Run tests across all workspaces |
-| `npm run test:backend` | Run backend Vitest test suite |
-| `npm run test:frontend` | Run frontend Vitest test suite |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:push` | Push Prisma schema changes to PostgreSQL |
+Configure the required environment variables using the project's
+.env.example files.
 
----
+📁 Project Structure
 
-## License
+CineTv/
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── backend/
+│   ├── src/
+│   ├── prisma/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── .github/
+├── docker-compose.yml
+├── package.json
+└── README.md
 
-Private — All rights reserved.
+🌐 Deployment
+
+Frontend --- Vercel
+
+The frontend is deployed as a Vite application on Vercel.
+
+Configure the production backend API URL through Vercel environment
+variables.
+
+Backend --- Render
+
+The backend can be deployed as a Render Web Service using the backend
+directory as the application root or through the included Docker
+configuration.
+
+The backend must listen on the deployment platform's assigned host/port.
+
+🎯 Why CineTV?
+
+Traditional movie platforms often follow:
+
+Search → Filter → Select
+
+CineTV aims for:
+
+Describe → Understand → Personalize → Recommend
+
+Users can describe how they feel or what kind of experience they want
+without needing to know an exact movie title, genre or language.
+
+🔮 Future Improvements
+
+More advanced personalized recommendation models
+
+Improved multilingual emotion detection
+
+Long-term preference learning
+
+More recommendation evaluation metrics
+
+Additional streaming-provider integrations
+
+Enhanced voice interaction
+
+Context-aware recommendations
+
+Improved cold-start personalization
+
+⚠️ Disclaimer
+
+CineTV relies on third-party services for movie metadata, trailers,
+authentication and streaming-provider information. Availability may vary
+by region and can change over time.
+
+👩‍💻 Project
+
+CineTV --- Intelligent Cinema Platform
+
+An AI-powered movie discovery and recommendation platform combining
+modern web development, movie APIs and intelligent recommendation
+techniques.
